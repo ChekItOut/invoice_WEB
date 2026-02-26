@@ -1,0 +1,38 @@
+# Prettier 무시 파일
+
+# 의존성
+node_modules/
+.pnp
+.pnp.js
+
+# 테스트 커버리지
+coverage/
+
+# Next.js 빌드
+.next/
+out/
+
+# 환경 변수
+.env
+.env.local
+.env.*.local
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# 빌드 결과
+dist/
+build/
+
+# 패키지 매니저
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+bun.lockb

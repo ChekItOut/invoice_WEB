@@ -10,20 +10,20 @@
  * - paid: 결제완료
  * - cancelled: 취소됨
  */
-export type InvoiceStatus = "draft" | "issued" | "paid" | "cancelled"
+export type InvoiceStatus = "draft" | "issued" | "paid" | "cancelled";
 
 /**
  * 당사자 정보 (발행자/수신자)
  */
 export interface Party {
   /** 회사명 또는 개인명 */
-  name: string
+  name: string;
   /** 이메일 주소 */
-  email?: string
+  email?: string;
   /** 전화번호 */
-  phone?: string
+  phone?: string;
   /** 주소 */
-  address?: string
+  address?: string;
 }
 
 /**
@@ -31,15 +31,15 @@ export interface Party {
  */
 export interface InvoiceItem {
   /** 항목 고유 ID */
-  id: string
+  id: string;
   /** 품목명 */
-  name: string
+  name: string;
   /** 수량 */
-  quantity: number
+  quantity: number;
   /** 단가 */
-  unitPrice: number
+  unitPrice: number;
   /** 금액 (수량 × 단가) */
-  amount: number
+  amount: number;
 }
 
 /**
@@ -47,27 +47,27 @@ export interface InvoiceItem {
  */
 export interface Invoice {
   /** 견적서 고유 ID */
-  id: string
+  id: string;
   /** 견적서 번호 (예: INV-2026-001) */
-  invoiceNumber: string
+  invoiceNumber: string;
   /** 발행일 (YYYY-MM-DD) */
-  issueDate: string
+  issueDate: string;
   /** 만료일 (YYYY-MM-DD) */
-  dueDate: string
+  dueDate: string;
   /** 견적서 상태 */
-  status: InvoiceStatus
+  status: InvoiceStatus;
   /** 발행자 정보 */
-  issuer: Party
+  issuer: Party;
   /** 수신자 정보 */
-  recipient: Party
+  recipient: Party;
   /** 견적 항목 목록 */
-  items: InvoiceItem[]
+  items: InvoiceItem[];
   /** 소계 (항목 금액 합계) */
-  subtotal: number
+  subtotal: number;
   /** 세금 (부가세) */
-  tax: number
+  tax: number;
   /** 총 금액 (소계 + 세금) */
-  totalAmount: number
+  totalAmount: number;
   /** 비고 사항 */
-  notes?: string
+  notes?: string;
 }

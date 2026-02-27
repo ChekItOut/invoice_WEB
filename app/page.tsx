@@ -54,8 +54,7 @@ export default function Home() {
             {/* 제목 */}
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight">
               견적서 관리를
-              <br />
-              더 쉽고 빠르게
+              <br />더 쉽고 빠르게
             </h1>
 
             {/* 설명 */}

@@ -142,12 +142,12 @@ npm run type-check
 
 ### Items (견적 항목 데이터베이스)
 
-| 필드        | 타입    | 설명               |
-| ----------- | ------- | ------------------ |
-| description | Title   | 항목 설명          |
-| quantity    | Number  | 수량               |
-| unit_price  | Number  | 단가               |
-| amount      | Formula | 금액 (수량 × 단가) |
+| 필드        | 타입     | 설명               |
+| ----------- | -------- | ------------------ |
+| description | Title    | 항목 설명          |
+| quantity    | Number   | 수량               |
+| unit_price  | Number   | 단가               |
+| amount      | Formula  | 금액 (수량 × 단가) |
 | invoice_id  | Relation | 연결된 견적서      |
 
 ## 📄 사용자 여정

@@ -53,6 +53,7 @@ memory: project
 **질문 및 확인 사항**:
 
 작업 시작 전 다음을 확인합니다:
+
 - Notion Integration이 이미 생성되었는지 여부
 - 접근해야 할 데이터베이스의 구조 및 ID
 - 필요한 권한 범위(읽기/쓰기)
@@ -63,6 +64,7 @@ memory: project
 **에이전트 메모리 업데이트**를 작업 중 발견한 내용을 기록하여 프로젝트 전반의 Notion 통합 지식을 축적합니다.
 
 기록할 내용:
+
 - 프로젝트에서 사용하는 Notion 데이터베이스 ID 및 스키마 구조
 - 자주 사용되는 쿼리 패턴 및 필터 조건
 - API 통합 시 발생한 문제와 해결 방법
@@ -77,6 +79,7 @@ You have a persistent Persistent Agent Memory directory at `C:\Users\danie\works
 As you work, consult your memory files to build on previous experience. When you encounter a mistake that seems like it could be common, check your Persistent Agent Memory for relevant notes — and if nothing is written yet, record what you learned.
 
 Guidelines:
+
 - `MEMORY.md` is always loaded into your system prompt — lines after 200 will be truncated, so keep it concise
 - Create separate topic files (e.g., `debugging.md`, `patterns.md`) for detailed notes and link to them from MEMORY.md
 - Update or remove memories that turn out to be wrong or outdated
@@ -84,18 +87,21 @@ Guidelines:
 - Use the Write and Edit tools to update your memory files
 
 What to save:
+
 - Stable patterns and conventions confirmed across multiple interactions
 - Key architectural decisions, important file paths, and project structure
 - User preferences for workflow, tools, and communication style
 - Solutions to recurring problems and debugging insights
 
 What NOT to save:
+
 - Session-specific context (current task details, in-progress work, temporary state)
 - Information that might be incomplete — verify against project docs before writing
 - Anything that duplicates or contradicts existing CLAUDE.md instructions
 - Speculative or unverified conclusions from reading a single file
 
 Explicit user requests:
+
 - When the user asks you to remember something across sessions (e.g., "always use bun", "never auto-commit"), save it — no need to wait for multiple interactions
 - When the user asks to forget or stop remembering something, find and remove the relevant entries from your memory files
 - Since this memory is project-scope and shared with your team via version control, tailor your memories to this project

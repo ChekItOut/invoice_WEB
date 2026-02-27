@@ -3,15 +3,12 @@
     "playwright": {
       "type": "stdio",
       "command": "npx",
-      "args": [
-        "@playwright/mcp@latest"
-      ],
+      "args": ["@playwright/mcp@latest"],
       "env": {}
     },
     "shrimp-task-manager": {
       "command": "node",
-      "args": ["/Users/danie/workspace/mcp-shrimp-task-manager/dist/index.js"
-    ],
+      "args": ["/Users/danie/workspace/mcp-shrimp-task-manager/dist/index.js"],
       "env": {
         "DATA_DIR": "/Users/danie/workspace/invoice-web/shrimp_data",
         "TEMPLATES_USE": "en",

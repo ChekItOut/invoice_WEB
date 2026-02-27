@@ -1,5 +1,7 @@
-import { FileText, Download, Database, Zap } from "lucide-react";
+import { FileText, Download, Database, Zap, ArrowRight } from "lucide-react";
+import Link from "next/link";
 
+import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 
 // 기능 아이템 인터페이스
@@ -63,6 +65,17 @@ export default function Home() {
               고유 링크로 공유하세요. 웹에서 바로 확인하고 PDF로 다운로드할 수
               있습니다.
             </p>
+
+            {/* CTA 버튼 */}
+            <div className="flex flex-col sm:flex-row gap-4 justify-center mt-8">
+              <Button asChild size="lg" className="text-base">
+                <Link href="/invoice/demo-2026-001" className="flex items-center gap-2">
+                  <FileText className="h-5 w-5" />
+                  데모 견적서 보기
+                  <ArrowRight className="h-4 w-4" />
+                </Link>
+              </Button>
+            </div>
           </div>
         </div>
       </section>

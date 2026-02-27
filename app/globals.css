@@ -206,3 +206,54 @@
   --sidebar-border: oklch(1 0 0 / 10%);
   --sidebar-ring: oklch(0.556 0 0);
 }
+
+/* 인쇄 최적화 스타일 */
+@media print {
+  /* 헤더, 푸터, 네비게이션, PDF 버튼 숨김 */
+  header,
+  footer,
+  nav,
+  .no-print,
+  button {
+    display: none !important;
+  }
+
+  /* 페이지 여백 최소화 */
+  body {
+    margin: 0;
+    padding: 0;
+  }
+
+  /* 배경색 제거 및 텍스트 색상 조정 (잉크 절약) */
+  * {
+    background: white !important;
+    color: black !important;
+    box-shadow: none !important;
+    text-shadow: none !important;
+  }
+
+  /* 페이지 나누기 최적화 - invoice-section 단위로 유지 */
+  .invoice-section {
+    page-break-inside: avoid;
+    break-inside: avoid;
+  }
+
+  /* 카드 테두리를 실선으로 변경 (인쇄 시 가독성) */
+  .border,
+  [class*="border"] {
+    border-color: #ccc !important;
+  }
+
+  /* 링크 URL 표시 (선택 사항) */
+  a[href]:after {
+    content: " (" attr(href) ")";
+    font-size: 0.8em;
+    color: #666 !important;
+  }
+
+  /* 불필요한 여백 축소 */
+  .container {
+    max-width: 100% !important;
+    padding: 0.5rem !important;
+  }
+}

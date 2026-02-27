@@ -31,10 +31,10 @@ export function Header() {
             기능
           </Link>
           <Link
-            href="/smoke-test"
+            href="/invoice/demo-2026-001"
             className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
           >
-            검증
+            데모
           </Link>
         </nav>
 

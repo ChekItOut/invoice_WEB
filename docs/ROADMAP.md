@@ -26,12 +26,18 @@
 
 ### 현재 프로젝트 상태
 
-프로젝트는 초기 설정이 완료된 상태입니다:
+**Phase 1: 애플리케이션 골격 구축 완료** (2026-02-27)
 
 - 루트 레이아웃 (Header, Footer, ThemeProvider) 구현 완료
 - 홈 페이지 (Hero, 기능 소개, 기술 스택 섹션) 구현 완료
-- shadcn/ui 기본 컴포넌트 설치 완료 (Button, Card, Badge, Dialog, DropdownMenu, Input)
+- shadcn/ui 기본 컴포넌트 설치 완료 (Button, Card, Badge, Dialog, DropdownMenu, Input, Skeleton)
 - 다크/라이트 테마 전환 기능 구현 완료
+- 전체 라우트 구조 및 페이지 골격 생성 완료
+- TypeScript 타입 정의 및 인터페이스 설계 완료 (Notion DB 검증 반영)
+- 더미 데이터 생성 유틸리티 구현 완료
+- 환경 변수 예제 파일 작성 완료
+
+**다음 단계**: Phase 2 - UI/UX 완성 (Task 003부터 시작)
 
 ---
 
@@ -66,30 +72,37 @@
 
 ## 개발 단계
 
-### Phase 1: 애플리케이션 골격 구축
+### Phase 1: 애플리케이션 골격 구축 ✅
 
 > 전체 라우트 구조, 타입 정의, 빈 페이지 껍데기를 먼저 완성하여 개발 기반을 마련합니다.
 
-- **Task 001: 프로젝트 라우트 구조 및 페이지 골격 생성** - 우선순위
-  - `app/invoice/[id]/page.tsx` 견적서 조회 페이지 빈 골격 생성
-  - `app/invoice/[id]/loading.tsx` 로딩 UI 골격 생성
-  - `app/invoice/[id]/not-found.tsx` 404 에러 페이지 골격 생성
-  - `app/api/generate-pdf/route.ts` PDF 생성 API 라우트 골격 생성
-  - 환경 변수 설정 파일 (`.env.local.example`) 작성
+- **Task 001: 프로젝트 라우트 구조 및 페이지 골격 생성** ✅ - 완료 (2026-02-27)
+  - See: `/tasks/001-route-structure.md`
+  - ✅ `app/invoice/[id]/page.tsx` 견적서 조회 페이지 빈 골격 생성
+  - ✅ `app/invoice/[id]/loading.tsx` 로딩 UI 골격 생성
+  - ✅ `app/invoice/[id]/not-found.tsx` 404 에러 페이지 골격 생성
+  - ✅ `app/api/generate-pdf/route.ts` PDF 생성 API 라우트 골격 생성
+  - ✅ 환경 변수 설정 파일 (`.env.local.example`) 작성
+  - ✅ shadcn/ui Skeleton 컴포넌트 설치
 
-- **Task 002: TypeScript 타입 정의 및 인터페이스 설계**
-  - `lib/types/invoice.ts` 견적서 관련 타입 정의 (Invoice, InvoiceItem, InvoiceStatus)
-  - `lib/types/notion.ts` Notion API 응답 매핑 타입 정의
-  - `lib/types/pdf.ts` PDF 생성 관련 타입 정의
-  - 더미 데이터 생성 유틸리티 `lib/mock/invoice-data.ts` 작성
-  - Notion 데이터베이스 필드와 TypeScript 타입 간 매핑 문서화
+- **Task 002: TypeScript 타입 정의 및 인터페이스 설계** ✅ - 완료 (2026-02-27)
+  - See: `/tasks/002-type-definitions.md`
+  - ✅ `lib/types/invoice.ts` 견적서 관련 타입 정의 (Invoice, InvoiceItem, InvoiceStatus)
+  - ✅ `lib/types/notion.ts` Notion API 응답 매핑 타입 정의
+  - ✅ `lib/types/pdf.ts` PDF 생성 관련 타입 정의
+  - ✅ 더미 데이터 생성 유틸리티 `lib/mock/invoice-data.ts` 작성
+  - ✅ Notion 데이터베이스 필드와 TypeScript 타입 간 매핑 문서화
+  - ✅ Notion 데이터베이스 구조 검증 및 타입 수정
+    - InvoiceItem에 `description`, `category` 필드 추가
+    - Invoice의 `subtotal`, `tax`를 optional로 변경
+    - Notion 엔티티(Invoices, Items) 매핑 정보 주석 추가
 
 ### Phase 2: UI/UX 완성 (더미 데이터 활용)
 
 > 실제 API 연동 없이 하드코딩된 더미 데이터로 모든 페이지 UI를 완성합니다.
 > 이 단계에서 전체 사용자 플로우를 시각적으로 검증할 수 있습니다.
 
-- **Task 003: 견적서 조회 페이지 UI 구현**
+- **Task 003: 견적서 조회 페이지 UI 구현** - 우선순위
   - 견적서 헤더 영역 (견적서 번호, 발행일, 유효기간, 상태 뱃지)
   - 발행자/수신자 정보 카드 컴포넌트
   - 견적 항목 테이블 (항목명, 수량, 단가, 금액)
@@ -188,7 +201,7 @@ Task 001 (라우트 골격)
                                                     └── Task 011 (Vercel 배포)
 ```
 
-- Phase 1 (Task 001-002): 모든 후속 작업의 기반. 반드시 먼저 완료
+- Phase 1 (Task 001-002): ✅ 완료 (2026-02-27). 모든 후속 작업의 기반
 - Phase 2 (Task 003-005): UI 작업은 서로 독립적이며 병렬 개발 가능
 - Phase 3 (Task 006-008): Task 006은 Phase 2 완료 후 시작. Task 007은 Task 006과 병렬 가능. Task 008은 006, 007 완료 후 시작
 - Phase 4 (Task 009-011): Task 008 완료 후 시작. 서로 독립적이며 병렬 가능
@@ -199,7 +212,7 @@ Task 001 (라우트 골격)
 
 | Phase                           | 예상 기간    | 비고                                |
 | ------------------------------- | ------------ | ----------------------------------- |
-| Phase 1: 애플리케이션 골격 구축 | 2-3일        | 구조 설계 및 타입 정의              |
+| Phase 1: 애플리케이션 골격 구축 | ✅ 완료      | 2026-02-27 완료                     |
 | Phase 2: UI/UX 완성             | 3-5일        | 더미 데이터 기반 전체 UI            |
 | Phase 3: 핵심 기능 구현         | 5-7일        | Notion API + PDF 생성 + 통합 테스트 |
 | Phase 4: 최적화 및 배포         | 2-3일        | 성능/SEO 최적화, Vercel 배포        |
@@ -207,6 +220,7 @@ Task 001 (라우트 골격)
 
 ---
 
-**문서 버전**: v1.0
+**문서 버전**: v1.1
 **작성일**: 2026-02-26
+**최종 수정일**: 2026-02-27
 **기반 문서**: docs/PRD.md v1.0 (MVP)

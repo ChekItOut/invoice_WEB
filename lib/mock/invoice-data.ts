@@ -40,6 +40,8 @@ export function generateMockInvoice(
         quantity: 1,
         unitPrice: 5000000,
         amount: 5000000,
+        description: "웹사이트 풀스택 개발 서비스",
+        category: "개발",
       },
       {
         id: "item-2",
@@ -47,6 +49,8 @@ export function generateMockInvoice(
         quantity: 1,
         unitPrice: 500000,
         amount: 500000,
+        description: "월간 유지보수 및 기술 지원",
+        category: "서비스",
       },
     ],
     subtotal: 5500000,

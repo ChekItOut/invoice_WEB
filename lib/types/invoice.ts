@@ -27,7 +27,7 @@ export interface Party {
 }
 
 /**
- * 견적 항목
+ * 견적 항목 (Notion Items 엔티티 매핑)
  */
 export interface InvoiceItem {
   /** 항목 고유 ID */
@@ -40,10 +40,14 @@ export interface InvoiceItem {
   unitPrice: number;
   /** 금액 (수량 × 단가) */
   amount: number;
+  /** 항목 설명 (Notion "설명" 속성) */
+  description?: string;
+  /** 항목 카테고리 (Notion "카테고리" 속성) */
+  category?: string;
 }
 
 /**
- * 견적서 전체 정보
+ * 견적서 전체 정보 (Notion Invoices 엔티티 매핑)
  */
 export interface Invoice {
   /** 견적서 고유 ID */
@@ -62,10 +66,10 @@ export interface Invoice {
   recipient: Party;
   /** 견적 항목 목록 */
   items: InvoiceItem[];
-  /** 소계 (항목 금액 합계) */
-  subtotal: number;
-  /** 세금 (부가세) */
-  tax: number;
+  /** 소계 (항목 금액 합계) - 계산용 필드, Notion에 없음 */
+  subtotal?: number;
+  /** 세금 (부가세) - 계산용 필드, Notion에 없음 */
+  tax?: number;
   /** 총 금액 (소계 + 세금) */
   totalAmount: number;
   /** 비고 사항 */

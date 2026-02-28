@@ -139,3 +139,91 @@ export async function getInvoiceItems(
 
   return items;
 }
+
+/**
+ * Notion 데이터베이스에서 견적서 목록을 조회합니다.
+ * @param options - 조회 옵션 (limit, startCursor)
+ * @returns 견적서 페이지 배열 및 페이지네이션 정보
+ * @throws NotionQueryError - DB ID 누락 또는 API 오류 시
+ */
+export async function getInvoiceList(
+  options: {
+    limit?: number;
+    startCursor?: string;
+  } = {}
+): Promise<{
+  invoices: PageObjectResponse[];
+  nextCursor: string | null;
+  hasMore: boolean;
+}> {
+  const notion = getNotionClient();
+
+  const databaseId = process.env.NOTION_DATABASE_ID;
+  if (!databaseId) {
+    throw new NotionQueryError(
+      "NOTION_DATABASE_ID 환경 변수가 설정되지 않았습니다.",
+      "MISSING_DATABASE_ID",
+      500
+    );
+  }
+
+  try {
+    const response = await notion.dataSources.query({
+      data_source_id: databaseId,
+      sorts: [{ property: "발행일", direction: "descending" }],
+      page_size: options.limit || 100,
+      start_cursor: options.startCursor,
+    });
+
+    // 전체 페이지 객체만 필터링 (DataSource 결과 제외)
+    const invoices = response.results.filter(
+      (result): result is PageObjectResponse =>
+        "properties" in result && result.object === "page"
+    );
+
+    return {
+      invoices,
+      nextCursor: response.next_cursor,
+      hasMore: response.has_more,
+    };
+  } catch (error) {
+    if (error instanceof NotionQueryError) {
+      throw error;
+    }
+
+    if (isNotionClientError(error)) {
+      if (error.code === APIErrorCode.Unauthorized) {
+        throw new NotionQueryError(
+          "Notion API 인증에 실패했습니다. NOTION_API_KEY를 확인해주세요.",
+          "UNAUTHORIZED",
+          401
+        );
+      }
+      if (error.code === APIErrorCode.RateLimited) {
+        throw new NotionQueryError(
+          "API 요청 횟수가 초과되었습니다. 잠시 후 다시 시도해주세요.",
+          "RATE_LIMITED",
+          429
+        );
+      }
+      if (error.code === APIErrorCode.ObjectNotFound) {
+        throw new NotionQueryError(
+          "데이터베이스를 찾을 수 없습니다. NOTION_DATABASE_ID를 확인해주세요.",
+          "DATABASE_NOT_FOUND",
+          404
+        );
+      }
+      throw new NotionQueryError(
+        `Notion API 오류: ${error.message}`,
+        error.code,
+        500
+      );
+    }
+
+    throw new NotionQueryError(
+      "알 수 없는 오류가 발생했습니다.",
+      "UNKNOWN",
+      500
+    );
+  }
+}

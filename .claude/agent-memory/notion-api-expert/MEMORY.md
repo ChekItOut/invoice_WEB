@@ -7,7 +7,7 @@
 
 ## Notion 모듈 구조
 - `lib/notion/client.ts` - 싱글톤 Notion 클라이언트 (NOTION_API_KEY 환경변수)
-- `lib/notion/queries.ts` - 페이지/항목 조회 함수 (getInvoicePage, getInvoiceItems)
+- `lib/notion/queries.ts` - 페이지/항목 조회 함수 (getInvoicePage, getInvoiceItems, getInvoiceList)
 - `lib/notion/mapper.ts` - Notion 응답 → Invoice 타입 변환
 - `lib/notion/index.ts` - re-export 진입점
 
@@ -42,3 +42,5 @@
 - Next.js 16에서 `params`는 `Promise<{ id: string }>` 타입 (async/await 필요)
 - Notion API rate limit: 배치 조회 시 10개씩 분할 처리
 - email/phone_number 속성은 Notion DB 설정에 따라 rich_text일 수도 있어 fallback 처리
+- **v5.9.0 Breaking Change**: `databases.query()` 제거됨 → `dataSources.query()` 사용 (파라미터: `data_source_id`)
+- `dataSources.query()` results에는 DataSourceObjectResponse도 포함되므로 `result.object === "page"` 체크 필요

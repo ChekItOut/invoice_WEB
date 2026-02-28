@@ -4,7 +4,12 @@
  */
 
 export { getNotionClient } from "./client";
-export { getInvoicePage, getInvoiceItems, NotionQueryError } from "./queries";
+export {
+  getInvoicePage,
+  getInvoiceItems,
+  getInvoiceList,
+  NotionQueryError,
+} from "./queries";
 export {
   mapNotionPageToInvoice,
   mapNotionItemsToInvoiceItems,

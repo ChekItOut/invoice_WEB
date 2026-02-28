@@ -69,7 +69,7 @@ export default function Home() {
             {/* CTA 버튼 */}
             <div className="flex flex-col sm:flex-row gap-4 justify-center mt-8">
               <Button asChild size="lg" className="text-base">
-                <Link href="/invoice/demo-2026-001" className="flex items-center gap-2">
+                <Link href="/invoices" className="flex items-center gap-2">
                   <FileText className="h-5 w-5" />
                   데모 견적서 보기
                   <ArrowRight className="h-4 w-4" />

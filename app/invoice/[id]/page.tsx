@@ -1,11 +1,23 @@
+import { notFound } from "next/navigation";
 import { Badge } from "@/components/ui/badge";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { PdfDownloadButton } from "@/components/invoice/pdf-download-button";
-import { generateMockInvoice } from "@/lib/mock/invoice-data";
+import {
+  getInvoicePage,
+  getInvoiceItems,
+  NotionQueryError,
+  mapNotionPageToInvoice,
+  mapNotionItemsToInvoiceItems,
+} from "@/lib/notion";
 import type { InvoiceStatus } from "@/lib/types/invoice";
 
 interface PageProps {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 }
 
 /**
@@ -19,6 +31,7 @@ function formatCurrency(amount: number): string {
  * 날짜를 한국 형식으로 포맷팅 (예: 2026년 2월 27일)
  */
 function formatDate(dateString: string): string {
+  if (!dateString) return "미지정";
   const date = new Date(dateString);
   return date.toLocaleDateString("ko-KR", {
     year: "numeric",
@@ -61,16 +74,42 @@ function getStatusLabel(status: InvoiceStatus): string {
   }
 }
 
-export default function InvoicePage({ params }: PageProps) {
-  // 더미 데이터 생성
-  const invoice = generateMockInvoice(params.id);
+/**
+ * 견적서 상세 페이지 (Server Component)
+ * Notion API에서 실제 견적서 데이터를 조회하여 렌더링합니다.
+ */
+export default async function InvoicePage({ params }: PageProps) {
+  const { id } = await params;
+
+  // Notion에서 견적서 페이지 조회
+  let notionPage;
+  try {
+    notionPage = await getInvoicePage(id);
+  } catch (error) {
+    if (error instanceof NotionQueryError && error.statusCode === 404) {
+      notFound();
+    }
+    // 기타 에러는 에러 바운더리로 전파
+    throw error;
+  }
+
+  // Notion 응답을 Invoice 타입으로 변환
+  const { invoice, itemRelationIds } = mapNotionPageToInvoice(notionPage);
+
+  // 관계된 항목(Items) 페이지들을 조회하여 매핑
+  if (itemRelationIds.length > 0) {
+    const itemPages = await getInvoiceItems(itemRelationIds);
+    invoice.items = mapNotionItemsToInvoiceItems(itemPages);
+  }
 
   return (
     <div className="container max-w-screen-2xl mx-auto py-6 md:py-8 lg:py-10 px-4 md:px-6 lg:px-8">
       {/* 견적서 헤더 영역 - 모바일: 세로 쌓기, 데스크톱: 좌우 배치 */}
       <div className="invoice-section flex flex-col gap-4 md:flex-row md:items-start md:justify-between mb-6 md:mb-8">
         <div>
-          <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold mb-2">{invoice.invoiceNumber}</h1>
+          <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold mb-2">
+            {invoice.invoiceNumber}
+          </h1>
           <div className="flex flex-col gap-1 text-sm md:text-base text-muted-foreground">
             <p>발행일: {formatDate(invoice.issueDate)}</p>
             <p>유효기간: {formatDate(invoice.dueDate)}</p>
@@ -99,7 +138,9 @@ export default function InvoicePage({ params }: PageProps) {
           </CardHeader>
           <CardContent className="space-y-2 text-sm">
             <div>
-              <p className="font-semibold text-base">{invoice.issuer.name}</p>
+              <p className="font-semibold text-base">
+                {invoice.issuer.name}
+              </p>
             </div>
             {invoice.issuer.email && (
               <div>
@@ -129,7 +170,9 @@ export default function InvoicePage({ params }: PageProps) {
           </CardHeader>
           <CardContent className="space-y-2 text-sm">
             <div>
-              <p className="font-semibold text-base">{invoice.recipient.name}</p>
+              <p className="font-semibold text-base">
+                {invoice.recipient.name}
+              </p>
             </div>
             {invoice.recipient.email && (
               <div>
@@ -159,79 +202,104 @@ export default function InvoicePage({ params }: PageProps) {
           <CardTitle className="text-lg">견적 항목</CardTitle>
         </CardHeader>
         <CardContent>
-          {/* 데스크톱 테이블 뷰 */}
-          <div className="hidden md:block overflow-x-auto">
-            <table className="w-full">
-              <thead>
-                <tr className="border-b">
-                  <th className="text-left py-3 px-4 font-semibold">항목명</th>
-                  <th className="text-right py-3 px-4 font-semibold">수량</th>
-                  <th className="text-right py-3 px-4 font-semibold">단가</th>
-                  <th className="text-right py-3 px-4 font-semibold">금액</th>
-                </tr>
-              </thead>
-              <tbody>
-                {invoice.items.map((item) => (
-                  <tr key={item.id} className="border-b last:border-0">
-                    <td className="py-4 px-4">
-                      <div>
-                        <p className="font-medium">{item.name}</p>
-                        {item.description && (
-                          <p className="text-sm text-muted-foreground mt-1">
-                            {item.description}
-                          </p>
-                        )}
-                      </div>
-                    </td>
-                    <td className="text-right py-4 px-4">{item.quantity}</td>
-                    <td className="text-right py-4 px-4">
-                      {formatCurrency(item.unitPrice)}
-                    </td>
-                    <td className="text-right py-4 px-4 font-semibold">
-                      {formatCurrency(item.amount)}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-
-          {/* 모바일 카드 뷰 - 가독성 높은 레이아웃 */}
-          <div className="md:hidden space-y-3">
-            {invoice.items.map((item) => (
-              <div
-                key={item.id}
-                className="border rounded-lg p-4 space-y-3"
-              >
-                <div>
-                  <p className="font-medium text-base">{item.name}</p>
-                  {item.description && (
-                    <p className="text-sm text-muted-foreground mt-1">
-                      {item.description}
-                    </p>
-                  )}
-                </div>
-                <div className="grid grid-cols-2 gap-2 text-sm">
-                  <div>
-                    <span className="text-muted-foreground">수량: </span>
-                    <span>{item.quantity}</span>
-                  </div>
-                  <div>
-                    <span className="text-muted-foreground">단가: </span>
-                    <span>{formatCurrency(item.unitPrice)}</span>
-                  </div>
-                </div>
-                <div className="pt-2 border-t">
-                  <div className="flex justify-between items-center">
-                    <span className="text-muted-foreground">금액</span>
-                    <span className="font-semibold text-lg">
-                      {formatCurrency(item.amount)}
-                    </span>
-                  </div>
-                </div>
+          {invoice.items.length === 0 ? (
+            <p className="text-muted-foreground text-sm py-4 text-center">
+              등록된 항목이 없습니다.
+            </p>
+          ) : (
+            <>
+              {/* 데스크톱 테이블 뷰 */}
+              <div className="hidden md:block overflow-x-auto">
+                <table className="w-full">
+                  <thead>
+                    <tr className="border-b">
+                      <th className="text-left py-3 px-4 font-semibold">
+                        항목명
+                      </th>
+                      <th className="text-right py-3 px-4 font-semibold">
+                        수량
+                      </th>
+                      <th className="text-right py-3 px-4 font-semibold">
+                        단가
+                      </th>
+                      <th className="text-right py-3 px-4 font-semibold">
+                        금액
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {invoice.items.map((item) => (
+                      <tr
+                        key={item.id}
+                        className="border-b last:border-0"
+                      >
+                        <td className="py-4 px-4">
+                          <div>
+                            <p className="font-medium">{item.name}</p>
+                            {item.description && (
+                              <p className="text-sm text-muted-foreground mt-1">
+                                {item.description}
+                              </p>
+                            )}
+                          </div>
+                        </td>
+                        <td className="text-right py-4 px-4">
+                          {item.quantity}
+                        </td>
+                        <td className="text-right py-4 px-4">
+                          {formatCurrency(item.unitPrice)}
+                        </td>
+                        <td className="text-right py-4 px-4 font-semibold">
+                          {formatCurrency(item.amount)}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
               </div>
-            ))}
-          </div>
+
+              {/* 모바일 카드 뷰 - 가독성 높은 레이아웃 */}
+              <div className="md:hidden space-y-3">
+                {invoice.items.map((item) => (
+                  <div
+                    key={item.id}
+                    className="border rounded-lg p-4 space-y-3"
+                  >
+                    <div>
+                      <p className="font-medium text-base">{item.name}</p>
+                      {item.description && (
+                        <p className="text-sm text-muted-foreground mt-1">
+                          {item.description}
+                        </p>
+                      )}
+                    </div>
+                    <div className="grid grid-cols-2 gap-2 text-sm">
+                      <div>
+                        <span className="text-muted-foreground">
+                          수량:{" "}
+                        </span>
+                        <span>{item.quantity}</span>
+                      </div>
+                      <div>
+                        <span className="text-muted-foreground">
+                          단가:{" "}
+                        </span>
+                        <span>{formatCurrency(item.unitPrice)}</span>
+                      </div>
+                    </div>
+                    <div className="pt-2 border-t">
+                      <div className="flex justify-between items-center">
+                        <span className="text-muted-foreground">금액</span>
+                        <span className="font-semibold text-lg">
+                          {formatCurrency(item.amount)}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </>
+          )}
         </CardContent>
       </Card>
 
@@ -258,7 +326,9 @@ export default function InvoicePage({ params }: PageProps) {
             {/* 구분선 */}
             <div className="border-t pt-3">
               <div className="flex justify-between items-center">
-                <span className="text-base md:text-lg font-bold">총 금액</span>
+                <span className="text-base md:text-lg font-bold">
+                  총 금액
+                </span>
                 <span className="text-xl md:text-2xl font-bold text-primary">
                   {formatCurrency(invoice.totalAmount)}
                 </span>

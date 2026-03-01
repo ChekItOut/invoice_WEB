@@ -15,10 +15,17 @@ import type { Invoice } from "@/lib/types/invoice";
 import { formatCurrency, formatDate, getStatusLabel } from "@/lib/utils/invoice";
 
 // 한글 폰트 등록 (Noto Sans KR)
-Font.register({
-  family: "NotoSansKR",
-  src: "https://fonts.gstatic.com/s/notosanskr/v27/PbykFmXiEBPT4ITbgNA5Cgm20xz64px_1hVWr0wuPNGmlQNMEfD4.ttf",
-});
+console.log("Registering Noto Sans KR font from Google Fonts CDN");
+try {
+  Font.register({
+    family: "NotoSansKR",
+    src: "https://fonts.gstatic.com/s/notosanskr/v27/PbykFmXiEBPT4ITbgNA5Cgm20xz64px_1hVWr0wuPNGmlQNMEfD4.ttf",
+  });
+  console.log("Font registration completed");
+} catch (fontError) {
+  console.error("Font registration failed:", fontError);
+  // 폰트 등록 실패 시에도 계속 진행 (기본 폰트 사용)
+}
 
 // PDF 스타일 정의
 const styles = StyleSheet.create({

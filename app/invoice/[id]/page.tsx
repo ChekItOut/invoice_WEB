@@ -1,4 +1,6 @@
 import { notFound } from "next/navigation";
+import type { Metadata } from "next";
+import dynamic from "next/dynamic";
 import { Badge } from "@/components/ui/badge";
 import {
   Card,
@@ -6,7 +8,6 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { PdfDownloadButton } from "@/components/invoice/pdf-download-button";
 import {
   getInvoicePage,
   getInvoiceItems,
@@ -16,8 +17,77 @@ import {
 } from "@/lib/notion";
 import type { InvoiceStatus } from "@/lib/types/invoice";
 
+/**
+ * PDF 다운로드 버튼 컴포넌트 동적 import
+ * 초기 번들 크기 감소를 위해 lazy loading 적용
+ */
+const PdfDownloadButton = dynamic(
+  () => import("@/components/invoice/pdf-download-button").then((mod) => ({ default: mod.PdfDownloadButton }))
+);
+
 interface PageProps {
   params: Promise<{ id: string }>;
+}
+
+/**
+ * 페이지 캐싱 설정 (ISR - Incremental Static Regeneration)
+ * 1시간(3600초) 동안 캐시된 페이지를 제공하고, 그 이후 재검증
+ */
+export const revalidate = 3600;
+
+/**
+ * 견적서 페이지 동적 메타데이터 생성
+ * SEO 최적화 및 소셜 미디어 공유를 위한 메타 태그 설정
+ */
+export async function generateMetadata({
+  params,
+}: PageProps): Promise<Metadata> {
+  const { id } = await params;
+
+  try {
+    // Notion에서 견적서 페이지 조회
+    const notionPage = await getInvoicePage(id);
+    const { invoice } = mapNotionPageToInvoice(notionPage);
+
+    // 발행일 포맷팅
+    const issueDate = invoice.issueDate
+      ? new Date(invoice.issueDate).toLocaleDateString("ko-KR", {
+          year: "numeric",
+          month: "long",
+          day: "numeric",
+        })
+      : "미지정";
+
+    // 수신자명
+    const recipientName = invoice.recipient.name || "미지정";
+
+    const title = `견적서 ${invoice.invoiceNumber} | Next Starter Kit`;
+    const description = `발행일: ${issueDate}, 수신자: ${recipientName}`;
+
+    return {
+      title,
+      description,
+      openGraph: {
+        title,
+        description,
+        type: "website",
+      },
+      robots: {
+        index: false,
+        follow: false,
+      },
+    };
+  } catch (error) {
+    // 에러 발생 시 기본 메타데이터 반환
+    return {
+      title: "견적서 | Next Starter Kit",
+      description: "견적서 조회 페이지",
+      robots: {
+        index: false,
+        follow: false,
+      },
+    };
+  }
 }
 
 /**

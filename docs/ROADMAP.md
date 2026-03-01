@@ -140,7 +140,7 @@
 
 > 더미 데이터를 실제 Notion API 호출로 교체하고, PDF 생성 기능을 구현합니다.
 
-- **Task 006: Notion API 연동 및 데이터 조회 구현** - 완료료
+- **Task 006: Notion API 연동 및 데이터 조회 구현** - 완료
   - `lib/notion/client.ts` Notion 클라이언트 초기화 및 설정 (F001)
   - `lib/notion/queries.ts` Notion Database Query API를 사용한 전체 견적서 목록 조회 함수 구현
   - `lib/notion/queries.ts` 견적서 개별 페이지 조회 함수 구현 (F001, F010)
@@ -151,7 +151,7 @@
   - 견적서 상세 페이지에서 더미 데이터를 실제 API 호출로 교체 (F002)
   - Playwright MCP를 활용한 Notion API 연동 통합 테스트 (목록 조회 + 상세 조회)
 
-- **Task 007: PDF 생성 및 다운로드 기능 구현**
+- **Task 007: PDF 생성 및 다운로드 기능 구현** - 완료
   - `components/pdf/invoice-template.tsx` React PDF 템플릿 컴포넌트 작성 (F003)
   - `app/api/generate-pdf/route.ts` PDF 생성 API 엔드포인트 구현 (F003)
   - 견적서 조회 페이지의 PDF 다운로드 버튼에 실제 기능 연결

@@ -140,7 +140,7 @@
 
 > 더미 데이터를 실제 Notion API 호출로 교체하고, PDF 생성 기능을 구현합니다.
 
-- **Task 006: Notion API 연동 및 데이터 조회 구현** - 우선순위
+- **Task 006: Notion API 연동 및 데이터 조회 구현** - 완료료
   - `lib/notion/client.ts` Notion 클라이언트 초기화 및 설정 (F001)
   - `lib/notion/queries.ts` Notion Database Query API를 사용한 전체 견적서 목록 조회 함수 구현
   - `lib/notion/queries.ts` 견적서 개별 페이지 조회 함수 구현 (F001, F010)

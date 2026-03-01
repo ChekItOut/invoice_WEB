@@ -3,6 +3,8 @@
  * 웹 페이지(app/invoice/[id]/page.tsx)와 유사한 레이아웃으로 PDF 문서를 렌더링합니다.
  */
 
+import path from "path";
+import fs from "fs";
 import {
   Document,
   Page,
@@ -14,12 +16,14 @@ import {
 import type { Invoice } from "@/lib/types/invoice";
 import { formatCurrency, formatDate, getStatusLabel } from "@/lib/utils/invoice";
 
-// 한글 폰트 등록 (Noto Sans KR)
-console.log("Registering Noto Sans KR font from Google Fonts CDN");
+// 한글 폰트 등록 (Noto Sans KR) - 실제 파일 시스템 경로 사용
+const fontPath = path.join(process.cwd(), "public", "fonts", "NotoSansKR-Regular.ttf");
+console.log("Font path:", fontPath, "exists?", fs.existsSync(fontPath));
+
 try {
   Font.register({
     family: "NotoSansKR",
-    src: "https://fonts.gstatic.com/s/notosanskr/v27/PbykFmXiEBPT4ITbgNA5Cgm20xz64px_1hVWr0wuPNGmlQNMEfD4.ttf",
+    src: fontPath, // 실제 파일 시스템 경로 사용
   });
   console.log("Font registration completed");
 } catch (fontError) {

@@ -15,6 +15,9 @@ import {
   NotionQueryError,
 } from "@/lib/notion";
 
+// Node.js 런타임 사용 (파일 시스템 접근 필요)
+export const runtime = "nodejs";
+
 /**
  * POST /api/generate-pdf
  * 견적서 ID를 받아 PDF를 생성하고 다운로드 가능한 응답을 반환합니다.

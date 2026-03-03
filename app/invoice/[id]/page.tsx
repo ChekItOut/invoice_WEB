@@ -15,7 +15,8 @@ import {
   mapNotionPageToInvoice,
   mapNotionItemsToInvoiceItems,
 } from "@/lib/notion";
-import type { InvoiceStatus } from "@/lib/types/invoice";
+import { generateMockInvoices } from "@/lib/mock/invoice-data";
+import type { InvoiceStatus, Invoice } from "@/lib/types/invoice";
 
 /**
  * PDF 다운로드 버튼 컴포넌트 동적 import
@@ -146,30 +147,49 @@ function getStatusLabel(status: InvoiceStatus): string {
 
 /**
  * 견적서 상세 페이지 (Server Component)
- * Notion API에서 실제 견적서 데이터를 조회하여 렌더링합니다.
+ * - Notion API에서 실제 견적서 데이터 조회
+ * - test-* ID 패턴이면 mockData 사용 (데모 모드)
  */
 export default async function InvoicePage({ params }: PageProps) {
   const { id } = await params;
 
-  // Notion에서 견적서 페이지 조회
-  let notionPage;
-  try {
-    notionPage = await getInvoicePage(id);
-  } catch (error) {
-    if (error instanceof NotionQueryError && error.statusCode === 404) {
-      notFound();
+  let invoice: Invoice;
+
+  // 데모 모드 감지: test-로 시작하는 ID는 mockData 사용
+  const isDemoMode = id.startsWith("test-");
+
+  if (isDemoMode) {
+    // mockData에서 해당 ID 견적서 찾기
+    const mockInvoices = generateMockInvoices(10);
+    const foundInvoice = mockInvoices.find((inv) => inv.id === id);
+
+    if (!foundInvoice) {
+      notFound(); // mockData에도 없으면 404
     }
-    // 기타 에러는 에러 바운더리로 전파
-    throw error;
-  }
 
-  // Notion 응답을 Invoice 타입으로 변환
-  const { invoice, itemRelationIds } = mapNotionPageToInvoice(notionPage);
+    invoice = foundInvoice;
+  } else {
+    // Notion에서 견적서 페이지 조회
+    let notionPage;
+    try {
+      notionPage = await getInvoicePage(id);
+    } catch (error) {
+      if (error instanceof NotionQueryError && error.statusCode === 404) {
+        notFound();
+      }
+      // 기타 에러는 에러 바운더리로 전파
+      throw error;
+    }
 
-  // 관계된 항목(Items) 페이지들을 조회하여 매핑
-  if (itemRelationIds.length > 0) {
-    const itemPages = await getInvoiceItems(itemRelationIds);
-    invoice.items = mapNotionItemsToInvoiceItems(itemPages);
+    // Notion 응답을 Invoice 타입으로 변환
+    const { invoice: notionInvoice, itemRelationIds } = mapNotionPageToInvoice(notionPage);
+    invoice = notionInvoice;
+
+    // 관계된 항목(Items) 페이지들을 조회하여 매핑
+    if (itemRelationIds.length > 0) {
+      const itemPages = await getInvoiceItems(itemRelationIds);
+      invoice.items = mapNotionItemsToInvoiceItems(itemPages);
+    }
   }
 
   return (

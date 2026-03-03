@@ -6,37 +6,52 @@ import {
   mapNotionPageToInvoice,
   NotionQueryError,
 } from "@/lib/notion";
+import { generateMockInvoices } from "@/lib/mock/invoice-data";
 import type { Invoice } from "@/lib/types/invoice";
+
+interface PageProps {
+  searchParams: Promise<{ demo?: string }>;
+}
 
 /**
  * 견적서 목록 페이지 (Server Component)
  * - Notion API에서 견적서 데이터를 조회하여 렌더링
+ * - demo=true 파라미터 시 mockData 사용
  * - 반응형: 모바일 1열, 태블릿 2열, 데스크톱 3열
  * - 에러 및 빈 상태 처리 포함
  */
-export default async function InvoicesPage() {
+export default async function InvoicesPage({ searchParams }: PageProps) {
+  const { demo } = await searchParams;
+  const isDemoMode = demo === "true";
+
   let invoices: Invoice[] = [];
   let errorMessage: string | null = null;
 
-  try {
-    const result = await getInvoiceList();
+  // 데모 모드: mockData 사용
+  if (isDemoMode) {
+    invoices = generateMockInvoices(6); // 6개의 데모 견적서 생성
+  } else {
+    // 프로덕션 모드: Notion API 사용
+    try {
+      const result = await getInvoiceList();
 
-    // Notion 페이지 응답을 Invoice 타입으로 변환 (목록에서는 items 조회 생략)
-    invoices = result.invoices.map((page) => {
-      const { invoice } = mapNotionPageToInvoice(page);
-      return invoice;
-    });
-  } catch (error) {
-    // 에러 발생 시 빈 배열 유지하고 에러 메시지 표시
+      // Notion 페이지 응답을 Invoice 타입으로 변환 (목록에서는 items 조회 생략)
+      invoices = result.invoices.map((page) => {
+        const { invoice } = mapNotionPageToInvoice(page);
+        return invoice;
+      });
+    } catch (error) {
+      // 에러 발생 시 빈 배열 유지하고 에러 메시지 표시
 
-    if (error instanceof NotionQueryError) {
-      errorMessage = error.message;
-      console.error(
-        `[견적서 목록 조회 실패] code=${error.code}, status=${error.statusCode}: ${error.message}`
-      );
-    } else {
-      errorMessage = "견적서 목록을 불러오는 중 오류가 발생했습니다.";
-      console.error("[견적서 목록 조회 실패] 알 수 없는 오류:", error);
+      if (error instanceof NotionQueryError) {
+        errorMessage = error.message;
+        console.error(
+          `[견적서 목록 조회 실패] code=${error.code}, status=${error.statusCode}: ${error.message}`
+        );
+      } else {
+        errorMessage = "견적서 목록을 불러오는 중 오류가 발생했습니다.";
+        console.error("[견적서 목록 조회 실패] 알 수 없는 오류:", error);
+      }
     }
   }
 
@@ -44,8 +59,11 @@ export default async function InvoicesPage() {
     <div className="container max-w-screen-2xl mx-auto py-6 md:py-8 lg:py-10 px-4 md:px-6 lg:px-8">
       {/* 헤더 */}
       <div className="mb-8">
-        <h1 className="text-3xl md:text-4xl font-bold mb-2">견적서 목록</h1>
+        <h1 className="text-3xl md:text-4xl font-bold mb-2">
+          {isDemoMode ? "데모 견적서 목록" : "견적서 목록"}
+        </h1>
         <p className="text-muted-foreground">
+          {isDemoMode && "샘플 데이터로 시스템을 미리 체험해보세요. "}
           전체 {invoices.length}개의 견적서
         </p>
       </div>

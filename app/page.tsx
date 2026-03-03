@@ -1,4 +1,11 @@
-import { FileText, Download, Database, Zap, ArrowRight } from "lucide-react";
+import {
+  FileText,
+  Download,
+  Database,
+  Zap,
+  ArrowRight,
+  ShieldCheck,
+} from "lucide-react";
 import Link from "next/link";
 
 import { Button } from "@/components/ui/button";
@@ -69,10 +76,21 @@ export default function Home() {
             {/* CTA 버튼 */}
             <div className="flex flex-col sm:flex-row gap-4 justify-center mt-8">
               <Button asChild size="lg" className="text-base">
-                <Link href="/invoices" className="flex items-center gap-2">
+                <Link href="/invoices?demo=true" className="flex items-center gap-2">
                   <FileText className="h-5 w-5" />
                   데모 견적서 보기
                   <ArrowRight className="h-4 w-4" />
+                </Link>
+              </Button>
+              <Button
+                asChild
+                size="lg"
+                variant="outline"
+                className="text-base"
+              >
+                <Link href="/admin/login" className="flex items-center gap-2">
+                  <ShieldCheck className="h-5 w-5" />
+                  관리자 로그인
                 </Link>
               </Button>
             </div>

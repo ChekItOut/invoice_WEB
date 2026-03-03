@@ -7,6 +7,7 @@
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
+import { Home } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
@@ -59,10 +60,18 @@ export function AdminNav() {
             </div>
           </div>
 
-          {/* 로그아웃 버튼 */}
-          <Button variant="outline" onClick={handleLogout}>
-            로그아웃
-          </Button>
+          {/* 액션 버튼들 */}
+          <div className="flex items-center gap-2">
+            <Button asChild variant="ghost" size="sm">
+              <Link href="/" className="flex items-center gap-2">
+                <Home className="h-4 w-4" />
+                <span className="hidden sm:inline">홈으로</span>
+              </Link>
+            </Button>
+            <Button variant="outline" size="sm" onClick={handleLogout}>
+              로그아웃
+            </Button>
+          </div>
         </div>
       </div>
     </nav>
